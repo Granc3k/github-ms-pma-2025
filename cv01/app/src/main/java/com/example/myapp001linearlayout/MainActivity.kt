@@ -31,19 +31,22 @@ class MainActivity : AppCompatActivity() {
 
 
         btnShip.setOnClickListener {
-            val name = etName.text.toString();
-            val surname = etSurname.text.toString();
-            val adress = etAdress.text.toString();
-            val age = etAge.text.toString();
+            val name = etName.text.toString()
+            val surname = etSurname.text.toString()
+            val adress = etAdress.text.toString()
+            val age = etAge.text.toString()
 
-            val output = """
-                Jméno: $name 
-                
-                ][Đđ
-                Příjmení: $surname
-                Věk: $age
-                Adresa: $adress
-            """.trimIndent()
+            val output = "Jméno: $name \n Příjmení: $surname \n Věk: $age \n Adresa: $adress"
+
+            tvInformation.text = output
+        }
+
+        btnDelete.setOnClickListener {
+            etName.text.clear()
+            etSurname.text.clear()
+            etAge.text.clear()
+            etAdress.text.clear()
+            tvInformation.text = ""
         }
     }
 }
