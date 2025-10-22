@@ -1,25 +1,34 @@
 package com.example.myapp004moreactivities
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapp004moreactivities.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    @SuppressLint("WrongViewCast")
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val btnSecondAct = findViewById<Button>(R.id.btnSecondAct)
-        val etNickname = findViewById<EditText>(R.id.etNickname)  // tady má být EditText, ne Button!
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        btnSecondAct.setOnClickListener {
-            val nickname = etNickname.text.toString()  // tady vezmeme text
+        // Nastavení toolbar
+        setSupportActionBar(binding.toolbar)
+
+        binding.btnSecondAct.setOnClickListener {
+            val nickname = binding.etNickname.text.toString()
+            val name = binding.etName.text.toString()
+            val age = binding.etAge.text.toString()
+            val email = binding.etEmail.text.toString()
+
             val intent = Intent(this, SecondActivity::class.java)
-            intent.putExtra("NICK_NAME", nickname)  // sem už jde String, takže OK
+            intent.putExtra("NICKNAME", nickname)
+            intent.putExtra("NAME", name)
+            intent.putExtra("AGE", age)
+            intent.putExtra("EMAIL", email)
             startActivity(intent)
         }
     }

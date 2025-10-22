@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".ThirdActivity"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
@@ -14,7 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="Hlavní aktivita"
+        app:title="Třetí aktivita"
         app:titleTextColor="@android:color/white" />
 
     <LinearLayout
@@ -26,47 +26,32 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vyplňte údaje pro přenos"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:text="Data z předchozích aktivit:"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp" />
 
-        <EditText
-            android:id="@+id/etNickname"
+        <TextView
+            android:id="@+id/tvAllInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Přezdívka"
-            android:layout_marginTop="20dp"/>
-
-        <EditText
-            android:id="@+id/etName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Celé jméno"
-            android:layout_marginTop="10dp"/>
-
-        <EditText
-            android:id="@+id/etAge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Věk"
-            android:inputType="number"
-            android:layout_marginTop="10dp"/>
-
-        <EditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:layout_marginTop="10dp"/>
+            android:text="Načítání..."
+            android:background="@color/material_dynamic_neutral_variant90"
+            android:padding="15dp"
+            android:layout_marginBottom="30dp" />
 
         <Button
-            android:id="@+id/btnSecondAct"
+            android:id="@+id/btnFinish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Odeslat data do 2. aktivity"
-            android:layout_marginTop="30dp"/>
+            android:text="Dokončit"
+            android:layout_marginBottom="10dp"/>
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zpět"/>
 
     </LinearLayout>
 
