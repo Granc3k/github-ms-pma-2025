@@ -9,31 +9,41 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Uhádni číslo 1 až 10"
+        android:text="Generátor náhodného čísla"
         android:textSize="22sp"
         android:layout_gravity="center_horizontal"
         android:paddingBottom="24dp" />
 
     <EditText
-        android:id="@+id/etTip"
+        android:id="@+id/etFrom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tvůj tip"
+        android:hint="Od"
+        android:inputType="number"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/etTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Do"
         android:inputType="number"
         android:layout_marginBottom="16dp"/>
 
     <Button
-        android:id="@+id/btnCheck"
+        android:id="@+id/btnGenerate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Zkontroluj"
+        android:text="Generuj číslo"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="24dp"/>
 
-    <Button
-        android:id="@+id/btnReset"
+    <TextView
+        android:id="@+id/tvResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reset"
+        android:text=""
+        android:textSize="20sp"
         android:layout_gravity="center_horizontal"/>
+
 </LinearLayout>
