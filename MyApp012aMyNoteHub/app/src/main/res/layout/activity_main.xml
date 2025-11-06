@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Nadpis aplikace -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Moje poznámky"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp" />
+
+    <!-- RecyclerView pro seznam poznámek -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewNotes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical" />
+
+    <!-- Tlačítko pro přidání nové poznámky -->
+    <Button
+        android:id="@+id/btnAddNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Přidat poznámku"
+        android:layout_marginTop="12dp" />
+
+</LinearLayout>

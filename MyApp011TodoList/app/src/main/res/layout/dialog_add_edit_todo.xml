@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Nazev ukolu"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputDesc"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="Popis (volitelne)"
+                android:maxLines="4"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPick"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Vybrat fotku (volitelne)"
+            android:layout_marginTop="12dp"/>
+
+        <ImageView
+            android:id="@+id/preview"
+            android:layout_width="match_parent" android:layout_height="180dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="Nahlad"
+            android:visibility="gone"/>
+    </LinearLayout>
+</ScrollView>
