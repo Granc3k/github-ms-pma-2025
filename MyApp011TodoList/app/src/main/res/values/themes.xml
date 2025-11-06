@@ -1,9 +1,25 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MyApp011TodoList" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+<resources>
+    <style name="Theme.MyApp011TodoList" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primarni paleta -->
+        <item name="colorPrimary">#10B981</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#D1FAE5</item>
+        <item name="colorOnPrimaryContainer">#064E3B</item>
 
-    <style name="Theme.MyApp011TodoList" parent="Base.Theme.MyApp011TodoList" />
+        <!-- Sekundarni akcent -->
+        <item name="colorSecondary">#3B82F6</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#DBEAFE</item>
+        <item name="colorOnSecondaryContainer">#1E3A8A</item>
+
+        <!-- Povrchy -->
+        <item name="colorSurface">#F8FAFC</item>
+        <item name="colorOnSurface">#0F172A</item>
+        <item name="colorSurfaceVariant">#E2E8F0</item>
+        <item name="colorOutline">#CBD5E1</item>
+
+        <!-- System bars -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+    </style>
 </resources>
