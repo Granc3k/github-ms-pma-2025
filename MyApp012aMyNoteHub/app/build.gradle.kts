@@ -7,9 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.myapp012amynotehub"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.myapp012amynotehub"
@@ -48,6 +46,7 @@ dependencies {
     implementation("androidx.room:room-runtime:${room_version}")
 
     ksp("androidx.room:room-compiler:$room_version")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

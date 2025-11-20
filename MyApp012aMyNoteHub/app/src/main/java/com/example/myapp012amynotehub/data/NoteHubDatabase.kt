@@ -2,6 +2,7 @@ package com.example.myapp012amynotehub.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import java.util.Locale
 
 @Database(
     entities = [Note::class],
@@ -9,6 +10,6 @@ import androidx.room.RoomDatabase
     exportSchema = false
 )
 
-abstract class NoteHubDatabase : RoomDatabase() {
+abstract class NoteHubDatabase: RoomDatabase() {
     abstract fun noteDao(): NoteDao
 }

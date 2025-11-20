@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MyApp012aMyNoteHub"
 include(":app")
+ 

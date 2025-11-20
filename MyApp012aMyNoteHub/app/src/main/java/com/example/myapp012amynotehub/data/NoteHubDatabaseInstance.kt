@@ -3,7 +3,6 @@ package com.example.myapp012amynotehub.data
 import android.content.Context
 import androidx.room.Room
 
-
 /**
  * Objekt, který zajišťuje, že v aplikaci bude existovat
  * pouze jedna instance databáze (tzv. Singleton).
