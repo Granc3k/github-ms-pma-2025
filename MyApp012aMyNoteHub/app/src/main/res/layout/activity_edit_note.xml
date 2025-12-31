@@ -20,6 +20,15 @@
             android:layout_marginBottom="12dp"
         />
 
+        <!-- Kategorie poznámky -->
+        <EditText
+            android:id="@+id/etEditCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Upravit kategorii (volitelně)"
+            android:layout_marginBottom="12dp"
+            android:inputType="text" />
+
         <EditText
             android:id="@+id/etEditContent"
             android:layout_width="match_parent"

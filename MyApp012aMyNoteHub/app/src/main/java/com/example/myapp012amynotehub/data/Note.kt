@@ -7,5 +7,7 @@ import androidx.room.PrimaryKey
 data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,  // ID poznámky, automaticky generované
     val title: String, // Název poznámky
-    val content: String // Obsah poznámky
+    val content: String, // Obsah poznámky
+    val createdAt: Long = System.currentTimeMillis(), // Čas vytvoření (ms)
+    val category: String? = null // Kategorie poznámky (volitelná)
 )

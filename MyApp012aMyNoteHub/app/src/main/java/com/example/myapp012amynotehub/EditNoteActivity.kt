@@ -18,6 +18,7 @@ class EditNoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditNoteBinding
     private lateinit var noteDao: NoteDao
     private var noteId: Int = -1
+    private var originalCreatedAt: Long = System.currentTimeMillis()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +38,8 @@ class EditNoteActivity : AppCompatActivity() {
                 if (note != null) {
                     binding.etEditTitle.setText(note.title)
                     binding.etEditContent.setText(note.content)
+                    binding.etEditCategory.setText(note.category ?: "")
+                    originalCreatedAt = note.createdAt
                 }
             }
         }
@@ -46,10 +49,14 @@ class EditNoteActivity : AppCompatActivity() {
             val updatedTitle = binding.etEditTitle.text.toString()
             val updatedContent = binding.etEditContent.text.toString()
 
+            val updatedCategory = binding.etEditCategory.text.toString().ifBlank { null }
+
             val updatedNote = Note(
                 id = noteId,
                 title = updatedTitle,
-                content = updatedContent
+                content = updatedContent,
+                createdAt = originalCreatedAt,
+                category = updatedCategory
             )
 
             lifecycleScope.launch(Dispatchers.IO) {

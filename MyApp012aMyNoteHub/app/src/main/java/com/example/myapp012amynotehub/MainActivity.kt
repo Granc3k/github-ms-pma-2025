@@ -7,19 +7,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapp012amynotehub.data.Note
 import com.example.myapp012amynotehub.data.NoteDao
 import com.example.myapp012amynotehub.data.NoteHubDatabaseInstance
 import com.example.myapp012amynotehub.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var noteDao: NoteDao
     private lateinit var adapter: NoteAdapter
+    private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,18 +62,14 @@ class MainActivity : AppCompatActivity() {
         //val noteDao = NoteHubDatabaseInstance.getDatabase(applicationContext).noteDao()
         noteDao = NoteHubDatabaseInstance.getDatabase(this).noteDao()
 
-        // 4) Pozorování dat pomocí Flow z Room
-        // Spustí korutinu v rámci životního cyklu aktivity.
-        // Když se aktivita zničí, korutina se automaticky ukončí.
-        lifecycleScope.launch {
-            // Sleduje Flow. Kdykoli se změní data v DB → seznam se okamžitě obnoví.
-            noteDao.getAllNotes().collectLatest { notes ->
-                //Pošle nová data do adapteru, aby se překreslil RecyclerView.
-                adapter.submitList(notes)
-            }
-
-
+        // 4) Search input handling: spouštíme sběr dat podle dotazu
+        binding.editTextSearch.addTextChangedListener { editable ->
+            val q = editable?.toString() ?: ""
+            startSearch(q)
         }
+
+        // start with empty query to load all notes
+        startSearch("")
 
 
 
@@ -79,6 +79,18 @@ class MainActivity : AppCompatActivity() {
         // a ukončí se automaticky, když se aktivita zničí
         lifecycleScope.launch(Dispatchers.IO) {
             noteDao.delete(note)
+        }
+    }
+
+    private fun startSearch(query: String) {
+        searchJob?.cancel()
+        searchJob = lifecycleScope.launch {
+            val flow = if (query.isBlank()) noteDao.getAllNotes() else noteDao.search("%" + query + "%")
+            flow.collectLatest { notes ->
+                withContext(Dispatchers.Main) {
+                    adapter.submitList(notes)
+                }
+            }
         }
     }
 }

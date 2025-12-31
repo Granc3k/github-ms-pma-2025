@@ -21,6 +21,15 @@
             android:inputType="textCapSentences"
             android:layout_marginBottom="12dp" />
 
+        <!-- Kategorie poznámky (volitelně) -->
+        <EditText
+            android:id="@+id/editTextCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Kategorie (volitelně)"
+            android:inputType="text"
+            android:layout_marginBottom="12dp" />
+
         <!-- Obsah poznámky -->
         <EditText
             android:id="@+id/editTextContent"

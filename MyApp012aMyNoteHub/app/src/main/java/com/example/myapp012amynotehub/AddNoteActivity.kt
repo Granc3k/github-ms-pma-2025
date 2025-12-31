@@ -29,13 +29,14 @@ class AddNoteActivity : AppCompatActivity() {
         binding.btnSaveNote.setOnClickListener {
             val title = binding.editTextTitle.text.toString()
             val content = binding.editTextContent.text.toString()
+            val category = binding.editTextCategory.text.toString().ifBlank { null }
 
             if (title.isEmpty() || content.isEmpty()) {
                 Toast.makeText(this, "Vyplň název i obsah", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val note = Note(title = title, content = content)
+            val note = Note(title = title, content = content, createdAt = System.currentTimeMillis(), category = category)
 
             // Spustí korutinu na vlákně určeném pro vstupně/výstupní operace (IO),
             // které jsou vhodné pro práci s databází, aby se nezablokovalo UI.

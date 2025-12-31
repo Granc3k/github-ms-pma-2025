@@ -33,6 +33,14 @@ class NoteAdapter(
 
         holder.binding.tvNoteTitle.text = currentNote.title
         holder.binding.tvNoteContent.text = currentNote.content
+        // Kategorie (skryjeme, pokud není)
+        val cat = currentNote.category
+        if (cat.isNullOrBlank()) {
+            holder.binding.tvNoteCategory.visibility = android.view.View.GONE
+        } else {
+            holder.binding.tvNoteCategory.visibility = android.view.View.VISIBLE
+            holder.binding.tvNoteCategory.text = cat
+        }
 
         // DOPLNĚNO: Kliknutí na EDIT ikonu
         holder.binding.ivEdit.setOnClickListener {
