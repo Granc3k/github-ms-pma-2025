@@ -16,9 +16,9 @@ TUL | předmět PMA | Šimon
 - [x] Úkol 10
 - [x] Úkol 11
 - [x] Úkol 12
-- [ ] Úkol 13 - dodělat celou edukační hru
+- [ ] Úkol 13 - TODO dodělat celou edukační hru
 - [x] Úkol 14
-- [ ] Úkol 15 - 
-- [ ] Úkol 16 -
-- [ ] Úkol 17 -
+- [x] Úkol 15 - implementováno ve vánoční appce (Úkol 17)
+- [x] Úkol 16 - implementováno ve vánoční appce (Úkol 17)
+- [x] Úkol 17
 - [ ] Semestral - základ v úkolu 11, TODO cloud dbs, další accounty, další featury

@@ -9,8 +9,9 @@ import com.example.myapp014asharedtasklist.databinding.ItemTaskBinding
 // Přijímá list úkolů a callbacky pro změnu stavu a smazání.
 class TaskAdapter(
     private var tasks: List<Task>,
-    private val onChecked: (Task) -> Unit,  // zavolá se při kliknutí na checkbox
-    private val onDelete: (Task) -> Unit     // zavolá se při kliknutí na ikonu smazání
+    private val onChecked: (Task, Boolean) -> Unit,  // zavolá se při změně checkboxu (task, newState)
+    private val onDelete: (Task) -> Unit,     // zavolá se při kliknutí na ikonu smazání
+    private val onEdit: (Task) -> Unit        // zavolá se při požadavku editace
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     // ViewHolder drží jeden řádek seznamu (item_task.xml) a jeho view binding.
@@ -33,17 +34,21 @@ class TaskAdapter(
         holder.binding.textTitle.text = task.title
 
         // Nastaví zaškrtnutí checkboxu podle hodnoty v objektu
+        // Odregistrovat předchozí listener, pak nastavit hodnotu a znovu listener
+        holder.binding.checkCompleted.setOnCheckedChangeListener(null)
         holder.binding.checkCompleted.isChecked = task.completed
-
-        // Listener pro změnu stavu checkboxu
-        // Když uživatel změní stav, zavolá se funkce onChecked(task)
-        holder.binding.checkCompleted.setOnCheckedChangeListener { _, _ ->
-            onChecked(task)
+        holder.binding.checkCompleted.setOnCheckedChangeListener { _, isChecked ->
+            onChecked(task, isChecked)
         }
 
         // Listener pro smazání úkolu
         holder.binding.imageDelete.setOnClickListener {
             onDelete(task)
+        }
+
+        // Klik na text spustí editaci
+        holder.binding.textTitle.setOnClickListener {
+            onEdit(task)
         }
     }
 
