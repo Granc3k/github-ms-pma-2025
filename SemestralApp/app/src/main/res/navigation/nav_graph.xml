@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.semestralapp.ui.HomeFragment"
+        android:label="Domů"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.example.semestralapp.ui.CategoriesFragment"
+        android:label="Kategorie"
+        tools:layout="@layout/fragment_categories">
+        <action
+            android:id="@+id/action_categoriesFragment_to_categoryTasksFragment"
+            app:destination="@id/categoryTasksFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryTasksFragment"
+        android:name="com.example.semestralapp.ui.CategoryTasksFragment"
+        android:label="Úkoly kategorie"
+        tools:layout="@layout/fragment_category_tasks">
+        <argument
+            android:name="categoryId"
+            app:argType="string" />
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.semestralapp.ui.ProfileFragment"
+        android:label="Profil"
+        tools:layout="@layout/fragment_profile" />
+
+</navigation>
