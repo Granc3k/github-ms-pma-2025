@@ -10,6 +10,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.example.semestralapp.databinding.FragmentProfileBinding
 
+/**
+ * Propfile fragment aplikace
+ * Uživatel si zde navolí své jméno, následně i theme, který chce mít v appce
+ *
+ * Byla zde myšlenka to udělat login based, že by to mohl používat každý ze svého uživatele, ale na to už nebyl čas to dělat, možná v budoucnu se to dodělá ¯\_(ツ)_/¯
+ */
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
@@ -28,11 +34,11 @@ class ProfileFragment : Fragment() {
 
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
 
-        // Load saved name
+        // Load savnutého jména
         val savedName = sharedPref.getString("user_name", "")
         binding.editUserName.setText(savedName)
 
-        // Load saved theme preference
+        // Load savenutého themu, následná úprava GUI podle selectnutého themu
         val isDarkMode = sharedPref.getBoolean("dark_mode", false)
         binding.switchDarkMode.isChecked = isDarkMode
 

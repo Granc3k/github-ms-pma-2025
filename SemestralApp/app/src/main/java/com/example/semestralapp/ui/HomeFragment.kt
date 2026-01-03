@@ -13,7 +13,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -29,25 +28,40 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.io.ByteArrayOutputStream
 
+/**
+ * Home fragment aplikace (Domovská obrazovka)
+ * Zobrazuje list všech úkolů seřazených podle času vytvoření
+ */
 class HomeFragment : Fragment() {
 
+    // ViewBinding proměnné pro přístup k layoutu fragment_home.xml
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    // Instance dbs Firestore
     private lateinit var db: FirebaseFirestore
+    // Adaptér pro list úkolů
     private lateinit var adapter: TaskAdapter
 
+    // Vars pro práci s imagem při addu/editu úkolu
     private var selectedImageBitmap: Bitmap? = null
     private lateinit var dialogImagePreview: ImageView
     
-    // List of categories for spinner
+    // List kategorií pro naplnění Spinneru (rozbalovacího menu)
     private var categoriesList: MutableList<Category> = mutableListOf()
 
+    // Registr pro výsledek aktivity - výběr image z galerie
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             try {
+                // Load obrázku ze zvoleného URI
                 val inputStream = requireContext().contentResolver.openInputStream(uri)
                 val bitmap = BitmapFactory.decodeStream(inputStream)
+                
+                // Zmenšení obrázku, aby nezabíral moc paměti a dal se uložit do Firestore
                 selectedImageBitmap = getResizedBitmap(bitmap, 800)
+                
+                // Print náhledu v dialogu
                 dialogImagePreview.setImageBitmap(selectedImageBitmap)
                 dialogImagePreview.visibility = View.VISIBLE
             } catch (e: Exception) {
@@ -61,6 +75,7 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Init bindingu
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -68,38 +83,49 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // Getnutí instance Firestore
         db = FirebaseFirestore.getInstance()
 
+        // Setting adaptéru pro RecyclerView
         adapter = TaskAdapter(
             tasks = emptyList(),
-            onChecked = { task -> toggleCompleted(task) },
-            onDelete = { task -> deleteTask(task) },
-            onItemClick = { task -> showEditTaskDialog(task) }
+            onChecked = { task -> toggleCompleted(task) }, // Callback změna stavu
+            onDelete = { task -> deleteTask(task) },       // Callback smazání
+            onItemClick = { task -> showEditTaskDialog(task) } // Callback editace
         )
 
         binding.recyclerViewTasks.layoutManager = LinearLayoutManager(context)
         binding.recyclerViewTasks.adapter = adapter
 
+        // btn pro addnutí nového úkolu
         binding.fabAddTask.setOnClickListener {
             showAddTaskDialog()
         }
 
+        // Start listeneru změn v dbs
         listenForTasks()
         fetchCategories()
     }
 
+    /**
+     * Watchuje změny v kolekci "tasks" v reálném čase
+     */
     private fun listenForTasks() {
         db.collection("tasks")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .orderBy("timestamp", Query.Direction.DESCENDING) // Řazení od nejnovějších
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
                     return@addSnapshotListener
                 }
+                // Transfer dokumentů na objekty Task a update listu
                 val taskList = snapshots?.toObjects(Task::class.java) ?: emptyList()
                 adapter.submitList(taskList)
             }
     }
     
+    /**
+     * Loadne seznam kategorií pro použití ve Spinneru
+     */
     private fun fetchCategories() {
         db.collection("categories")
             .orderBy("name")
@@ -108,12 +134,15 @@ class HomeFragment : Fragment() {
                 
                 val fetchedCategories = snapshots?.toObjects(Category::class.java) ?: mutableListOf()
                 categoriesList.clear()
-                // Add default category
+                // Ruční přidání výchozí kategorie "Vše"
                 categoriesList.add(Category(id = "default", name = "Vše"))
                 categoriesList.addAll(fetchedCategories)
             }
     }
 
+    /**
+     * Addne nový úkol do Firestore.
+     */
     private fun addTask(title: String, note: String, categoryId: String, photoBase64: String?) {
         val task = Task(
             title = title,
@@ -125,6 +154,9 @@ class HomeFragment : Fragment() {
         db.collection("tasks").add(task)
     }
     
+    /**
+     * Update existující úkol ve Firestore.
+     */
     private fun updateTask(task: Task, title: String, note: String, categoryId: String, photoBase64: String?) {
         if (task.id.isNotEmpty()) {
             val updates = hashMapOf<String, Any>(
@@ -132,6 +164,7 @@ class HomeFragment : Fragment() {
                 "note" to note,
                 "categoryId" to categoryId
             )
+            // Update fotky pouze pokud byla vybrána nová
             if (photoBase64 != null) {
                 updates["photoUrl"] = photoBase64
             }
@@ -140,18 +173,27 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Switchne stav splnění úkolu (completed)
+     */
     private fun toggleCompleted(task: Task) {
         if (task.id.isNotEmpty()) {
             db.collection("tasks").document(task.id).update("completed", !task.completed)
         }
     }
 
+    /**
+     * Deletne úkol z databáze
+     */
     private fun deleteTask(task: Task) {
         if (task.id.isNotEmpty()) {
             db.collection("tasks").document(task.id).delete()
         }
     }
 
+    /**
+     * Printne dialog pro vytvoření nového úkolu
+     */
     private fun showAddTaskDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_task, null)
         val editTitle = dialogView.findViewById<EditText>(R.id.editTaskTitle)
@@ -160,7 +202,7 @@ class HomeFragment : Fragment() {
         val btnPhoto = dialogView.findViewById<Button>(R.id.btnSelectPhoto)
         dialogImagePreview = dialogView.findViewById(R.id.imagePreview)
         
-        // Setup spinner
+        // Setting adaptéru pro Spinner (výběr kategorie)
         val categoryNames = categoriesList.map { it.name }
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNames)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -168,6 +210,7 @@ class HomeFragment : Fragment() {
         
         selectedImageBitmap = null
 
+        // btn pro výběr fotky
         btnPhoto.setOnClickListener {
             getContent.launch("image/*")
         }
@@ -178,6 +221,8 @@ class HomeFragment : Fragment() {
             .setPositiveButton("Přidat") { _, _ ->
                 val title = editTitle.text.toString()
                 val note = editNote.text.toString()
+                
+                // Getnutí selectnuté kategorie ze Spinneru
                 val selectedCategoryPosition = spinnerCategory.selectedItemPosition
                 val categoryId = if (selectedCategoryPosition >= 0 && selectedCategoryPosition < categoriesList.size) {
                     categoriesList[selectedCategoryPosition].id
@@ -185,6 +230,7 @@ class HomeFragment : Fragment() {
                     "default"
                 }
                 
+                // Convert vybrané fotky na Base64
                 var photoBase64: String? = null
                 if (selectedImageBitmap != null) {
                     photoBase64 = bitmapToBase64(selectedImageBitmap!!)
@@ -200,6 +246,9 @@ class HomeFragment : Fragment() {
             .show()
     }
 
+    /**
+     * Printne dialog pro edit existujícího úkolu
+     */
     private fun showEditTaskDialog(task: Task) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_task_detail, null)
         val editTitle = dialogView.findViewById<TextInputEditText>(R.id.editTaskTitle)
@@ -208,24 +257,25 @@ class HomeFragment : Fragment() {
         val btnPhoto = dialogView.findViewById<Button>(R.id.btnSelectPhoto)
         dialogImagePreview = dialogView.findViewById(R.id.detailImage)
         
+        // Předvyplnění polí
         editTitle.setText(task.title)
         editNote.setText(task.note)
         
-        // Setup spinner
+        // Setting Spinneru
         val categoryNames = categoriesList.map { it.name }
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNames)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategory.adapter = adapter
         
-        // Set selected category
+        // Setting vybrané kategorie ve Spinneru
         val currentCategoryIndex = categoriesList.indexOfFirst { it.id == task.categoryId }
         if (currentCategoryIndex != -1) {
             spinnerCategory.setSelection(currentCategoryIndex)
         }
 
-        selectedImageBitmap = null // Reset unless user picks new one
+        selectedImageBitmap = null 
         
-        // Load existing image if any
+        // Load existující fotky
         if (!task.photoUrl.isNullOrEmpty()) {
              try {
                 val decodedString = Base64.decode(task.photoUrl, Base64.DEFAULT)
@@ -270,6 +320,10 @@ class HomeFragment : Fragment() {
             .show()
     }
 
+    /**
+     * Pomocná fce pro zmenšení bitmapy (obrázku)
+     * šetří to paměť na limity daný Firestorem (dokument max 1MB)
+     */
     private fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap {
         var width = image.width
         var height = image.height
@@ -285,6 +339,9 @@ class HomeFragment : Fragment() {
         return Bitmap.createScaledBitmap(image, width, height, true)
     }
 
+    /**
+     * Transfer bitmapy na Base64 String pro save do dbs
+     */
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)

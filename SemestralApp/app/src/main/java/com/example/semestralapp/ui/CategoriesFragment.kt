@@ -16,11 +16,18 @@ import com.example.semestralapp.data.Category
 import com.example.semestralapp.databinding.FragmentCategoriesBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * Fragment pro správu kategorií
+ * Zobrazuje seznam všech kategorií, umožňuje jejich addnutí, edit a delete
+ */
 class CategoriesFragment : Fragment() {
 
     private var _binding: FragmentCategoriesBinding? = null
     private val binding get() = _binding!!
+    
+    // Instance Firestore
     private lateinit var db: FirebaseFirestore
+    // Adaptér pro seznam kategorií
     private lateinit var adapter: CategoryAdapter
 
     override fun onCreateView(
@@ -38,6 +45,7 @@ class CategoriesFragment : Fragment() {
 
         adapter = CategoryAdapter(
             categories = emptyList(),
+            // Po clicku na kategorii přejdeme na seznam úkolů v dané kategorii
             onClick = { category -> 
                 val action = CategoriesFragmentDirections.actionCategoriesFragmentToCategoryTasksFragment(
                     categoryId = category.id,
@@ -45,14 +53,18 @@ class CategoriesFragment : Fragment() {
                 )
                 findNavController().navigate(action)
             },
+            // Callback pro edit
             onEdit = { category -> 
+                // Speciální kontrola - výchozí kategorii nelze upravit
                 if (category.id == "default") {
                     Toast.makeText(context, "Výchozí kategorii nelze upravit", Toast.LENGTH_SHORT).show()
                 } else {
                     showEditCategoryDialog(category) 
                 }
             },
+            // Callback pro delete
             onDelete = { category -> 
+                // Speciální kontrola - výchozí kategorii nelze smazat
                 if (category.id == "default") {
                     Toast.makeText(context, "Výchozí kategorii nelze smazat", Toast.LENGTH_SHORT).show()
                 } else {
@@ -71,6 +83,9 @@ class CategoriesFragment : Fragment() {
         listenForCategories()
     }
 
+    /**
+     * Watchuje změny v kolekci "categories".
+     */
     private fun listenForCategories() {
         db.collection("categories")
             .orderBy("name")
@@ -81,7 +96,9 @@ class CategoriesFragment : Fragment() {
                 val categoryList = snapshots?.toObjects(Category::class.java) ?: mutableListOf()
                 
                 val fullList = mutableListOf<Category>()
-                // Add default category manually
+                // Ručně přidá výchozí kategorii "Vše" na začátek seznamu
+                // Tahle kategorie fyzicky neexistuje v kolekci "categories", ale reprezentuje filtr na úkoly s categoryId="default"
+                // Tohle bylo jediný co mi fachčilo a nechtělo se mi to dál řešit :D
                 fullList.add(Category(id = "default", name = "Vše"))
                 fullList.addAll(categoryList)
                 
@@ -89,21 +106,32 @@ class CategoriesFragment : Fragment() {
             }
     }
 
+    /**
+     * Creatne novou kategorii v dbs
+     */
     private fun addCategory(name: String) {
         val category = Category(name = name)
         db.collection("categories").add(category)
     }
 
+    /**
+     * Editne název existující kategorie
+     */
     private fun updateCategory(category: Category, newName: String) {
         if (category.id.isNotEmpty()) {
             db.collection("categories").document(category.id).update("name", newName)
         }
     }
 
+    /**
+     * Deletne kategorii a přesune její úkoly do "default" - "Vše" kategorie
+     */
     private fun deleteCategory(category: Category) {
         if (category.id.isNotEmpty()) {
+            // 1. Delete samotné kategorie
             db.collection("categories").document(category.id).delete()
             
+            // 2. Search všech úkolů v této kategorii a jejich transfer do "default"
             db.collection("tasks")
                 .whereEqualTo("categoryId", category.id)
                 .get()

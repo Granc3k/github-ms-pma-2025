@@ -30,20 +30,31 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.io.ByteArrayOutputStream
 
+/**
+ * Fragment pro zobrazení úkolů v konkrétní selectnuté kategorii
+ * Přijímá ID kategorie jako argument při navigaci.
+ */
 class CategoryTasksFragment : Fragment() {
 
     private var _binding: FragmentCategoryTasksBinding? = null
     private val binding get() = _binding!!
+    
+    // Instance Firestore
     private lateinit var db: FirebaseFirestore
     private lateinit var adapter: TaskAdapter
+    
+    // Getnutí argumentů předaných při navigaci (categoryId, categoryName)
+    // Je vyžtadovanej plugin "androidx.navigation.safeargs.kotlin" v build.gradle
     private val args: CategoryTasksFragmentArgs by navArgs()
 
+    // Vars pro obrázek
     private var selectedImageBitmap: Bitmap? = null
     private lateinit var dialogImagePreview: ImageView
     
-    // For spinner in edit dialog
+    // List kategorií pro Spinner v edit dialogu
     private var categoriesList: MutableList<Category> = mutableListOf()
 
+    // Registr aktivity pro choose obrázku
     private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             try {
@@ -72,11 +83,12 @@ class CategoryTasksFragment : Fragment() {
         
         db = FirebaseFirestore.getInstance()
         
+        // Init adaptéru - stejný jako v HomeFragment
         adapter = TaskAdapter(
             tasks = emptyList(),
             onChecked = { task -> toggleCompleted(task) },
             onDelete = { task -> deleteTask(task) },
-            onItemClick = { task -> showEditTaskDialog(task) }
+            onItemClick = { task -> showEditTaskDialog(task) } // Click otevře editační dialog
         )
 
         binding.recyclerViewTasks.layoutManager = LinearLayoutManager(context)
@@ -87,12 +99,15 @@ class CategoryTasksFragment : Fragment() {
         }
 
         listenForTasks()
-        fetchCategories()
+        fetchCategories() // Je potřeba kategorie pro editační dialog
     }
 
+    /**
+     * Watchuje úkoly, které patří POUZE do vybrané kategorie (categoryId z argumentů)
+     */
     private fun listenForTasks() {
         db.collection("tasks")
-            .whereEqualTo("categoryId", args.categoryId)
+            .whereEqualTo("categoryId", args.categoryId) // Filtrace podle kategorie
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
@@ -103,6 +118,9 @@ class CategoryTasksFragment : Fragment() {
             }
     }
     
+    /**
+     * Load kategorií pro Spinner (stejné jako v HomeFragment)
+     */
     private fun fetchCategories() {
         db.collection("categories")
             .orderBy("name")
@@ -117,6 +135,7 @@ class CategoryTasksFragment : Fragment() {
     }
 
     private fun addTask(title: String, note: String, photoBase64: String?) {
+        // Tady se fixně nastavujeme categoryId na tu, ve které se právě nacházíme
         val task = Task(
             title = title,
             note = note,
@@ -154,6 +173,10 @@ class CategoryTasksFragment : Fragment() {
         }
     }
 
+    /**
+     * Dialog pro addnutí úkolu v kontextu konkrétní kategorie.
+     * Zde se kategorie nevybírá, je předem dána.
+     */
     private fun showAddTaskDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_task, null)
         val editTitle = dialogView.findViewById<EditText>(R.id.editTaskTitle)
@@ -162,7 +185,7 @@ class CategoryTasksFragment : Fragment() {
         val btnPhoto = dialogView.findViewById<Button>(R.id.btnSelectPhoto)
         dialogImagePreview = dialogView.findViewById(R.id.imagePreview)
         
-        // Hide spinner in Add Task within CategoryTasksFragment as the category is fixed to the current view
+        // Spinner pro výběr kategorie se skryje, protože addujeme úkol přímo do té kategorie
         spinnerCategory.visibility = View.GONE
         
         selectedImageBitmap = null
@@ -193,6 +216,11 @@ class CategoryTasksFragment : Fragment() {
             .show()
     }
 
+    /**
+     * Dialog pro editac úkolu
+     * Zde se umožňuje změnit kategorii, i když je uživatel v detailu jiné kategorie
+     * Pokud uživatel změní kategorii, úkol zmizí z aktuálního seznamu (protože přestane splňovat filtr).
+     */
     private fun showEditTaskDialog(task: Task) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_task_detail, null)
         val editTitle = dialogView.findViewById<TextInputEditText>(R.id.editTaskTitle)
@@ -204,13 +232,13 @@ class CategoryTasksFragment : Fragment() {
         editTitle.setText(task.title)
         editNote.setText(task.note)
         
-        // Setup spinner
+        // Setting Spinneru kategorií
         val categoryNames = categoriesList.map { it.name }
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categoryNames)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategory.adapter = adapter
         
-        // Set selected category
+        // Předvybrání aktuální kategorie
         val currentCategoryIndex = categoriesList.indexOfFirst { it.id == task.categoryId }
         if (currentCategoryIndex != -1) {
             spinnerCategory.setSelection(currentCategoryIndex)
